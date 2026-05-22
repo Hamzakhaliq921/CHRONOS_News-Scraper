@@ -26,5 +26,4 @@ echo "   Server is starting..."
 echo "   Please wait while we gather the news"
 echo "========================================"
 echo ""
-
 python3 app.py
