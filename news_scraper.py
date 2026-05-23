@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import json
 import time
@@ -19,67 +18,7 @@ class NewsAggregator:
             'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         )
-        
-        # ==============================
-        # ✅ BROWSER SETUP (FIXED FOR WINDOWS)
-        # ==============================
-        try:
-            # Try to use webdriver-manager first
-            try:
-                from webdriver_manager.chrome import ChromeDriverManager
-                driver_path = ChromeDriverManager().install()
-                
-                # Fix: webdriver-manager sometimes returns a folder path
-                if not driver_path.endswith('.exe'):
-                    import os
-                    possible_path = os.path.join(driver_path, 'chromedriver.exe')
-                    if os.path.exists(possible_path):
-                        driver_path = possible_path
-                    else:
-                        # Search for chromedriver.exe in the folder
-                        for root, dirs, files in os.walk(driver_path):
-                            if 'chromedriver.exe' in files:
-                                driver_path = os.path.join(root, 'chromedriver.exe')
-                                break
-                
-                print(f"✅ ChromeDriver installed at: {driver_path}")
-                service = Service(driver_path)
-                
-            except Exception as e:
-                print(f"⚠️ webdriver-manager failed: {e}")
-                # Fallback to manual ChromeDriver path
-                manual_paths = [
-                    r"C:\chromedriver\chromedriver.exe",
-                    r"chromedriver.exe",
-                    r"C:\chromedriver-win64\chromedriver.exe"
-                ]
-                
-                driver_path = None
-                for path in manual_paths:
-                    if os.path.exists(path):
-                        driver_path = path
-                        break
-                
-                if driver_path:
-                    print(f"✅ Using manual ChromeDriver: {driver_path}")
-                    service = Service(driver_path)
-                else:
-                    raise Exception("No ChromeDriver found. Please download from https://googlechromelabs.github.io/chrome-for-testing/")
-            
-            # Initialize driver
-            self.driver = webdriver.Chrome(service=service, options=chrome_options)
-            print("✅ Browser initialized successfully")
-            
-        except Exception as e:
-            print(f"❌ Failed to start Chrome: {e}")
-            print("\n🔧 TROUBLESHOOTING:")
-            print("1. Ensure Chrome browser is installed")
-            print("2. Download ChromeDriver from: https://googlechromelabs.github.io/chrome-for-testing/")
-            print("3. Match your Chrome version (chrome://version/)")
-            print("4. Place chromedriver.exe in C:\\chromedriver\\")
-            print("5. Or install webdriver-manager: pip install webdriver-manager")
-            raise e
-        
+        self.driver = webdriver.Chrome(options=chrome_options)
         self.all_news = {}
 
     # ------------------------------------------------------------------
@@ -225,7 +164,7 @@ class NewsAggregator:
             self.all_news['AP News'] = []
 
     # ------------------------------------------------------------------
-    # The New York Times (Replaced Express Tribune)
+    # The New York Times (Replaces The Express Tribune)
     # ------------------------------------------------------------------
     def scrape_nytimes(self):
         print("Scraping The New York Times...")
@@ -237,11 +176,11 @@ class NewsAggregator:
             selectors = [
                 'h2 a',
                 'h3 a',
+                '.css-1j836f9 a',
+                '.story-link',
                 'article h2 a',
                 'article h3 a',
-                '.css-1l4w6pd a',
-                '.story-heading a',
-                '.headline a'
+                '.css-1m5k2vt a'
             ]
             elements = []
             for sel in selectors:
@@ -255,15 +194,14 @@ class NewsAggregator:
                     title = el.text.strip()
                     link = el.get_attribute('href')
                     if title and link and title not in seen and len(title) > 20:
-                        # Filter out non-article links
-                        if '/live/' in link or '/video/' in link or '/podcasts/' in link:
-                            continue
                         seen.add(title)
                         if not link.startswith('http'):
                             link = 'https://www.nytimes.com' + link
-                        articles.append({'title': title, 'link': link, 'summary': ''})
-                        if len(articles) >= 5:
-                            break
+                        # Filter out non-article links
+                        if '/video/' not in link and '/live/' not in link:
+                            articles.append({'title': title, 'link': link, 'summary': ''})
+                            if len(articles) >= 5:
+                                break
                 except Exception:
                     continue
 
@@ -369,7 +307,7 @@ class NewsAggregator:
         self.scrape_cnn()
         self.scrape_aljazeera()
         self.scrape_apnews()
-        self.scrape_nytimes()  # New York Times instead of Express Tribune
+        self.scrape_nytimes()  # Replaced The Express Tribune with NYT
         self.scrape_dawn()
         self.scrape_npr()
 
@@ -382,17 +320,15 @@ class NewsAggregator:
         print(f"  Data saved to {filename}")
 
     def close(self):
-        if hasattr(self, 'driver'):
-            self.driver.quit()
+        self.driver.quit()
 
 
 # ------------------------------------------------------------------
 # Standalone run
 # ------------------------------------------------------------------
 if __name__ == "__main__":
-    aggregator = None
+    aggregator = NewsAggregator()
     try:
-        aggregator = NewsAggregator()
         news_data = aggregator.scrape_all()
         aggregator.save_to_json()
 
@@ -402,8 +338,5 @@ if __name__ == "__main__":
             status = "OK " if articles else "EMPTY"
             print(f"  [{status}] {source}: {len(articles)} articles")
         print("-" * 40)
-    except Exception as e:
-        print(f"\n❌ Fatal error: {e}")
     finally:
-        if aggregator:
-            aggregator.close()
+        aggregator.close()
