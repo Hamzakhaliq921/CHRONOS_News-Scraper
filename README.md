@@ -143,5 +143,3 @@ taskkill /PID <PID> /F
 MIT — see [LICENSE](LICENSE) for details.
 
 ---
-
-> **Note:** This project is for educational purposes. Please respect each website's `robots.txt` and terms of service.
