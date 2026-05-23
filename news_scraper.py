@@ -256,7 +256,70 @@ class NewsAggregator:
     # ------------------------------------------------------------------
     # NPR News
     # ------------------------------------------------------------------
-  
+    def scrape_npr(self):
+        print("Scraping NPR News...")
+        try:
+            self.driver.get("https://www.npr.org/sections/news/")
+            time.sleep(3)
+
+            articles = []
+            selectors = [
+                'h2.title a',
+                'h3.title a',
+                'article h2 a',
+                'article h3 a',
+            ]
+            elements = []
+            for sel in selectors:
+                elements.extend(self.driver.find_elements(By.CSS_SELECTOR, sel))
+                if len(elements) >= 20:
+                    break
+
+            seen = set()
+            for el in elements:
+                try:
+                    title = el.text.strip()
+                    link = el.get_attribute('href')
+                    if title and link and title not in seen and len(title) > 20:
+                        seen.add(title)
+                        articles.append({'title': title, 'link': link, 'summary': ''})
+                        if len(articles) >= 5:
+                            break
+                except Exception:
+                    continue
+
+            self.all_news['NPR News'] = articles
+            print(f"  NPR News: Found {len(articles)} articles")
+        except Exception as e:
+            print(f"  NPR News failed: {e}")
+            self.all_news['NPR News'] = []
+
+    # ------------------------------------------------------------------
+    # Orchestration
+    # ------------------------------------------------------------------
+    def scrape_all(self):
+        print("\n  Starting Global News Aggregation...\n")
+
+        self.scrape_bbc()
+        self.scrape_cnn()
+        self.scrape_aljazeera()
+        self.scrape_apnews()
+        self.scrape_express_tribune()  # Replaced France 24
+        self.scrape_dawn()              # Replaced DW News
+        self.scrape_npr()
+
+        print("\n  Scraping Complete!\n")
+        return self.all_news
+
+    def save_to_json(self, filename='news_data.json'):
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(self.all_news, f, indent=2, ensure_ascii=False)
+        print(f"  Data saved to {filename}")
+
+    def close(self):
+        self.driver.quit()
+
+
 # ------------------------------------------------------------------
 # Standalone run
 # ------------------------------------------------------------------
