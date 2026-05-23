@@ -323,3 +323,17 @@ class NewsAggregator:
 # ------------------------------------------------------------------
 # Standalone run
 # ------------------------------------------------------------------
+if __name__ == "__main__":
+    aggregator = NewsAggregator()
+    try:
+        news_data = aggregator.scrape_all()
+        aggregator.save_to_json()
+
+        print("\n  Summary:")
+        print("-" * 40)
+        for source, articles in news_data.items():
+            status = "OK " if articles else "EMPTY"
+            print(f"  [{status}] {source}: {len(articles)} articles")
+        print("-" * 40)
+    finally:
+        aggregator.close()
