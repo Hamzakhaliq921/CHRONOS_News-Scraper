@@ -336,4 +336,5 @@ if __name__ == "__main__":
             print(f"  [{status}] {source}: {len(articles)} articles")
         print("-" * 40)
     finally:
+        
         aggregator.close()
