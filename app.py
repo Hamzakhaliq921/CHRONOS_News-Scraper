@@ -7,3 +7,9 @@ import threading
 import time
 from news_scraper import NewsAggregator
 
+app = Flask(__name__)
+
+# Global variable to store news data
+news_cache = {}
+last_update = None
+is_scraping = False
