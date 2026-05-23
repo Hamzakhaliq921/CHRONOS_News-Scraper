@@ -1,10 +1,8 @@
 from flask import Flask, render_template, jsonify
 import json
 import os
-
 from datetime import datetime
 import threading
-import time
 from news_scraper import NewsAggregator
 
 app = Flask(__name__)
@@ -36,20 +34,6 @@ def scrape_news_background():
     finally:
         is_scraping = False
 
-def load_cached_data():
-    """Load cached news data from JSON file"""
-    global news_cache, last_update
-    
-    if os.path.exists('news_data.json'):
-        try:
-            with open('news_data.json', 'r', encoding='utf-8') as f:
-                news_cache = json.load(f)
-            # Get file modification time
-            last_update = datetime.fromtimestamp(os.path.getmtime('news_data.json'))
-            print("✅ Loaded cached news data")
-        except Exception as e:
-            print(f"⚠️ Could not load cached data: {e}")
-
 @app.route('/')
 def index():
     """Serve the main page"""
@@ -80,13 +64,13 @@ def refresh_news():
     return jsonify({'status': 'scraping_started'})
 
 if __name__ == '__main__':
-    # Load cached data on startup
-    load_cached_data()
+    print("\n" + "="*50)
+    print("   CHRONOS NEWS AGGREGATOR")
+    print("="*50)
     
-    # If no cache exists, scrape immediately
-    if not news_cache:
-        print("No cached data found. Starting initial scrape...")
-        scrape_news_background()
+    # FIXED: Always scrape fresh news on startup, don't load old cache
+    print("\n📡 Fetching latest news (this takes 30-60 seconds)...\n")
+    scrape_news_background()
     
     # Get local IP for network access
     import socket

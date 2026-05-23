@@ -114,13 +114,13 @@ const renderAllNews = (newsData) => {
         return;
     }
 
-    // UPDATED: Global sources in display order with The New York Times
+    // FIXED: Match exactly what your scraper produces
     const sourceOrder = [
         'BBC News',
         'CNN',
         'Al Jazeera',
         'AP News',
-        'The New York Times',  // Replaced The Express Tribune
+        'The Express Tribune',
         'Dawn',
         'NPR News'
     ];
@@ -243,12 +243,10 @@ const showNotification = (message) => {
                 position: fixed;
                 top: 100px;
                 right: 20px;
-                background: var(--accent-primary);
+                background: #c41e3a;
                 color: white;
                 padding: 1rem 1.5rem;
                 border-radius: 8px;
-                box-shadow: var(--shadow-lg);
-                font-family: var(--font-body);
                 font-weight: 600;
                 z-index: 1000;
                 opacity: 0;

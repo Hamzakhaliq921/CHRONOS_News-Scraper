@@ -164,23 +164,22 @@ class NewsAggregator:
             self.all_news['AP News'] = []
 
     # ------------------------------------------------------------------
-    # The New York Times (Replaces The Express Tribune)
+    # The Express Tribune (Pakistan)
     # ------------------------------------------------------------------
-    def scrape_nytimes(self):
-        print("Scraping The New York Times...")
+    def scrape_express_tribune(self):
+        print("Scraping The Express Tribune...")
         try:
-            self.driver.get("https://www.nytimes.com")
+            self.driver.get("https://tribune.com.pk")
             time.sleep(3)
 
             articles = []
             selectors = [
                 'h2 a',
                 'h3 a',
-                '.css-1j836f9 a',
-                '.story-link',
+                '.story-title a',
+                '.card-title a',
                 'article h2 a',
-                'article h3 a',
-                '.css-1m5k2vt a'
+                'article h3 a'
             ]
             elements = []
             for sel in selectors:
@@ -196,20 +195,18 @@ class NewsAggregator:
                     if title and link and title not in seen and len(title) > 20:
                         seen.add(title)
                         if not link.startswith('http'):
-                            link = 'https://www.nytimes.com' + link
-                        # Filter out non-article links
-                        if '/video/' not in link and '/live/' not in link:
-                            articles.append({'title': title, 'link': link, 'summary': ''})
-                            if len(articles) >= 5:
-                                break
+                            link = 'https://tribune.com.pk' + link
+                        articles.append({'title': title, 'link': link, 'summary': ''})
+                        if len(articles) >= 5:
+                            break
                 except Exception:
                     continue
 
-            self.all_news['The New York Times'] = articles
-            print(f"  The New York Times: Found {len(articles)} articles")
+            self.all_news['The Express Tribune'] = articles
+            print(f"  The Express Tribune: Found {len(articles)} articles")
         except Exception as e:
-            print(f"  The New York Times failed: {e}")
-            self.all_news['The New York Times'] = []
+            print(f"  The Express Tribune failed: {e}")
+            self.all_news['The Express Tribune'] = []
 
     # ------------------------------------------------------------------
     # Dawn (Pakistan)
@@ -307,8 +304,8 @@ class NewsAggregator:
         self.scrape_cnn()
         self.scrape_aljazeera()
         self.scrape_apnews()
-        self.scrape_nytimes()  # Replaced The Express Tribune with NYT
-        self.scrape_dawn()
+        self.scrape_express_tribune()  # Replaced France 24
+        self.scrape_dawn()              # Replaced DW News
         self.scrape_npr()
 
         print("\n  Scraping Complete!\n")
