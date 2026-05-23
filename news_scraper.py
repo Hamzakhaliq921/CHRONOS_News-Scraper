@@ -90,7 +90,123 @@ class NewsAggregator:
     # ------------------------------------------------------------------
     # Al Jazeera
     # ------------------------------------------------------------------
-   
+    def scrape_aljazeera(self):
+        print("Scraping Al Jazeera...")
+        try:
+            self.driver.get("https://www.aljazeera.com")
+            time.sleep(3)
+
+            articles = []
+            elements = self.driver.find_elements(
+                By.CSS_SELECTOR, 'article h3 a'
+            )[:10]
+
+            for el in elements:
+                try:
+                    title = el.text.strip()
+                    link = el.get_attribute('href')
+                    if title and link:
+                        if not link.startswith('http'):
+                            link = 'https://www.aljazeera.com' + link
+                        articles.append({'title': title, 'link': link, 'summary': ''})
+                        if len(articles) >= 5:
+                            break
+                except Exception:
+                    continue
+
+            self.all_news['Al Jazeera'] = articles
+            print(f"  Al Jazeera: Found {len(articles)} articles")
+        except Exception as e:
+            print(f"  Al Jazeera failed: {e}")
+            self.all_news['Al Jazeera'] = []
+
+    # ------------------------------------------------------------------
+    # AP News
+    # ------------------------------------------------------------------
+    def scrape_apnews(self):
+        print("Scraping AP News...")
+        try:
+            self.driver.get("https://apnews.com")
+            time.sleep(3)
+
+            articles = []
+            selectors = [
+                'div.PagePromo-content a.Link',
+                'div.FeedCard a.Link',
+                'h2 a.Link',
+                'h3 a.Link',
+            ]
+            elements = []
+            for sel in selectors:
+                elements.extend(self.driver.find_elements(By.CSS_SELECTOR, sel))
+                if len(elements) >= 20:
+                    break
+
+            seen = set()
+            for el in elements:
+                try:
+                    title = el.text.strip()
+                    link = el.get_attribute('href')
+                    if title and link and title not in seen and len(title) > 20:
+                        seen.add(title)
+                        if not link.startswith('http'):
+                            link = 'https://apnews.com' + link
+                        articles.append({'title': title, 'link': link, 'summary': ''})
+                        if len(articles) >= 5:
+                            break
+                except Exception:
+                    continue
+
+            self.all_news['AP News'] = articles
+            print(f"  AP News: Found {len(articles)} articles")
+        except Exception as e:
+            print(f"  AP News failed: {e}")
+            self.all_news['AP News'] = []
+
+    # ------------------------------------------------------------------
+    # The Express Tribune (Pakistan)
+    # ------------------------------------------------------------------
+    def scrape_express_tribune(self):
+        print("Scraping The Express Tribune...")
+        try:
+            self.driver.get("https://tribune.com.pk")
+            time.sleep(3)
+
+            articles = []
+            selectors = [
+                'h2 a',
+                'h3 a',
+                '.story-title a',
+                '.card-title a',
+                'article h2 a',
+                'article h3 a'
+            ]
+            elements = []
+            for sel in selectors:
+                elements.extend(self.driver.find_elements(By.CSS_SELECTOR, sel))
+                if len(elements) >= 20:
+                    break
+
+            seen = set()
+            for el in elements:
+                try:
+                    title = el.text.strip()
+                    link = el.get_attribute('href')
+                    if title and link and title not in seen and len(title) > 20:
+                        seen.add(title)
+                        if not link.startswith('http'):
+                            link = 'https://tribune.com.pk' + link
+                        articles.append({'title': title, 'link': link, 'summary': ''})
+                        if len(articles) >= 5:
+                            break
+                except Exception:
+                    continue
+
+            self.all_news['The Express Tribune'] = articles
+            print(f"  The Express Tribune: Found {len(articles)} articles")
+        except Exception as e:
+            print(f"  The Express Tribune failed: {e}")
+            self.all_news['The Express Tribune'] = []
 
     # ------------------------------------------------------------------
     # Dawn (Pakistan)
