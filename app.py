@@ -93,3 +93,15 @@ if __name__ == '__main__':
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     
+    # Start the Flask server
+    print("\n" + "="*50)
+    print("🚀 Chronos News Aggregator is running!")
+    print("="*50)
+    print(f"\n📱 Access the application at:")
+    print(f"   → Local:   http://127.0.0.1:5000")
+    print(f"   → Local:   http://localhost:5000")
+    print(f"   → Network: http://{local_ip}:5000")
+    print("\n⚠️  Press CTRL+C to stop the server")
+    print("="*50 + "\n")
+    
+    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
