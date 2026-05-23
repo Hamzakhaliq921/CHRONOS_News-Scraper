@@ -34,6 +34,20 @@ def scrape_news_background():
     finally:
         is_scraping = False
 
+def load_cached_data():
+    """Load cached news data from JSON file"""
+    global news_cache, last_update
+    
+    if os.path.exists('news_data.json'):
+        try:
+            with open('news_data.json', 'r', encoding='utf-8') as f:
+                news_cache = json.load(f)
+            # Get file modification time
+            last_update = datetime.fromtimestamp(os.path.getmtime('news_data.json'))
+            print("✅ Loaded cached news data")
+        except Exception as e:
+            print(f"⚠️ Could not load cached data: {e}")
+
 @app.route('/')
 def index():
     """Serve the main page"""
@@ -64,28 +78,40 @@ def refresh_news():
     return jsonify({'status': 'scraping_started'})
 
 if __name__ == '__main__':
-    print("\n" + "="*50)
-    print("   CHRONOS NEWS AGGREGATOR")
-    print("="*50)
+    # Load cached data on startup
+    load_cached_data()
     
-    # FIXED: Always scrape fresh news on startup, don't load old cache
-    print("\n📡 Fetching latest news (this takes 30-60 seconds)...\n")
-    scrape_news_background()
+    # If no cache exists, scrape immediately
+    if not news_cache:
+        print("No cached data found. Starting initial scrape...")
+        scrape_news_background()
     
     # Get local IP for network access
     import socket
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     
-    # Start the Flask server
+    # Get all possible IPs
+    try:
+        # Try to get the actual network IP
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        network_ip = s.getsockname()[0]
+        s.close()
+    except:
+        network_ip = local_ip
+    
+    # Print custom banner
     print("\n" + "="*50)
     print("🚀 Chronos News Aggregator is running!")
     print("="*50)
     print(f"\n📱 Access the application at:")
     print(f"   → Local:   http://127.0.0.1:5000")
     print(f"   → Local:   http://localhost:5000")
-    print(f"   → Network: http://{local_ip}:5000")
+    print(f"   → Network: http://{network_ip}:5000")
     print("\n⚠️  Press CTRL+C to stop the server")
     print("="*50 + "\n")
     
+    # Run Flask app without reloader to prevent duplicate messages
+    # Flask will print its own server info after this
     app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
