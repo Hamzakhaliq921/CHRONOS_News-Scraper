@@ -211,7 +211,48 @@ class NewsAggregator:
     # ------------------------------------------------------------------
     # Dawn (Pakistan)
     # ------------------------------------------------------------------
-   
+    def scrape_dawn(self):
+        print("Scraping Dawn...")
+        try:
+            self.driver.get("https://www.dawn.com")
+            time.sleep(3)
+
+            articles = []
+            selectors = [
+                'h2 a',
+                'h3 a',
+                '.story__title a',
+                '.media__title a',
+                'article h2 a',
+                'article h3 a'
+            ]
+            elements = []
+            for sel in selectors:
+                elements.extend(self.driver.find_elements(By.CSS_SELECTOR, sel))
+                if len(elements) >= 20:
+                    break
+
+            seen = set()
+            for el in elements:
+                try:
+                    title = el.text.strip()
+                    link = el.get_attribute('href')
+                    if title and link and title not in seen and len(title) > 20:
+                        seen.add(title)
+                        if not link.startswith('http'):
+                            link = 'https://www.dawn.com' + link
+                        articles.append({'title': title, 'link': link, 'summary': ''})
+                        if len(articles) >= 5:
+                            break
+                except Exception:
+                    continue
+
+            self.all_news['Dawn'] = articles
+            print(f"  Dawn: Found {len(articles)} articles")
+        except Exception as e:
+            print(f"  Dawn failed: {e}")
+            self.all_news['Dawn'] = []
+
     # ------------------------------------------------------------------
     # NPR News
     # ------------------------------------------------------------------
