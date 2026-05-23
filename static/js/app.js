@@ -114,14 +114,14 @@ const renderAllNews = (newsData) => {
         return;
     }
 
-    // UPDATED: Global sources in display order with Pakistani news outlets
+    // UPDATED: Global sources in display order with The New York Times
     const sourceOrder = [
         'BBC News',
         'CNN',
         'Al Jazeera',
         'AP News',
-        'The Express Tribune',  // Replaced France 24
-        'Dawn',                 // Replaced DW News
+        'The New York Times',  // Replaced The Express Tribune
+        'Dawn',
         'NPR News'
     ];
 
