@@ -88,4 +88,8 @@ if __name__ == '__main__':
         print("No cached data found. Starting initial scrape...")
         scrape_news_background()
     
-  
+    # Get local IP for network access
+    import socket
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    
