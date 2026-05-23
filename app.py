@@ -78,3 +78,14 @@ def refresh_news():
     thread.start()
     
     return jsonify({'status': 'scraping_started'})
+
+if __name__ == '__main__':
+    # Load cached data on startup
+    load_cached_data()
+    
+    # If no cache exists, scrape immediately
+    if not news_cache:
+        print("No cached data found. Starting initial scrape...")
+        scrape_news_background()
+    
+  
