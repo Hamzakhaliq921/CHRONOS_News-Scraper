@@ -16,6 +16,11 @@
 </div>
 
 ---
+Uploading Chronos • News Aggregator - Google Chrome 2026-05-23 16-35-18 (1).mp4…
+<img width="1184" height="629" alt="first" src="https://github.com/user-attachments/assets/e322890d-21f4-4fca-9531-ac2ee5206085" />
+<img width="1144" height="609" alt="s1" src="https://github.com/user-attachments/assets/f5fe0cde-d4d9-4d42-896a-ae77311c4362" />
+<img width="1185" height="605" alt="s2" src="https://github.com/user-attachments/assets/e0ddff3b-129b-46e6-b816-ad7299d4f25b" />
+<img width="1249" height="680" alt="s3" src="https://github.com/user-attachments/assets/0a5be0cf-2eb1-435e-b520-fd86913fc757" />
 
 ## 🎯 The Problem
 
